@@ -2,6 +2,11 @@
     {
         "id": 1,
         "name": "Milton",
-        "lastName": "Wery"
+        "last_name": "Wery"
+    },
+    {
+        "name": "Juan ",
+        "last_name": "cruz",
+        "id": 2
     }
 ]

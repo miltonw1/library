@@ -1,56 +1,38 @@
-import fs from 'fs/promises';
-import path from 'path';
+export default function usersRepository(db) {
 
-const file = path.join('repositories', 'users.json')
+    return {
 
-export async function getAllUsers() {
-    const users = await fs.readFile(file)
-    return JSON.parse(users)
-}
+        async getAllUsers() {
+            const { rows } = await db.query("SELECT * from users")
+            return rows
+        },
 
-export async function getUser(id) {
-    const users = await getAllUsers()
-    return users.find((user) => user.id === id)
-}
+        async getUser(id) {
+            const { rows } = await db.query("SELECT * from users WHERE id = $1", [id])
+            return rows
+        },
 
-export async function createUser(payload) {
+        async createUser({ name, last_name }) {
+            const sql = "INSERT INTO users (name, last_name) VALUES ($1, $2)"
 
-    let users = await getAllUsers();
-    const id = users.length + 1;
+            const { rows } = await db.query(sql, [name, last_name])
 
-    const newUser = { ...payload, id }
+            return rows
+        },
 
-    users.push(newUser)
+        async updateUser({ id ,name, last_name }) {
+            const sql = "UPDATE users SET name = $1, last_name = $2 WHERE id = $3"
 
-    await fs.writeFile(file, JSON.stringify(users, null, 4))
-}
+            const { rows } = await db.query(sql, [name, last_name, id])
 
-export async function updateUser(payload) {
-    let users = await getAllUsers()
+            return rows
+        },
 
-    const index = users.findIndex((user) => user.id === payload.id)
+        async deleteUser(id) {
+            const { rows } = await db.query("DELETE FROM users WHERE id = $1", [id])
 
-    if (index === -1) {
-        return undefined
+            return rows
+        },
     }
-
-    users[index] = payload
-
-    await fs.writeFile(file, JSON.stringify(users, null, 4))
-    return payload;
 }
 
-export async function deleteUser(id) {
-    let user = await getAllUsers();
-
-    const index = user.findIndex((user) => user.id === id)
-
-    if (index === -1) {
-        return undefined
-    }
-
-    const deletedUser = user.splice(index, 1)
-
-    await fs.writeFile(file, JSON.stringify(user, null, 4))
-    return deletedUser[0]
-}

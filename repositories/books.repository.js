@@ -1,58 +1,39 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-const file = path.join('repositories', 'books.json')
-
-export async function getAllBooks() {
-    const books = await fs.readFile(file)
-    return JSON.parse(books)
-}
-
-export async function getBook(id) {
-    const books = await getAllBooks()
-    return books.find((book)=> book.id === id)
-}
-
-export async function updateBook(payload) {
-    let books = await getAllBooks()
-
-    const index = books.findIndex((book) => book.id === payload.id)
-
-    if (index === -1) {
-        return undefined
-    }
-
-    books[index] = payload
-
-    await fs.writeFile(file, JSON.stringify(books, null, 4))
-    return payload;
-}
-
-export async function createBook(payload) {
-
-    let books = await getAllBooks()
-    const id = books.length + 1;
+export default function booksRepository (db) {
     
-    const newBook = {...payload, id}
 
-    books.push(newBook)
+    return {
+        async getAllBooks() {
+            const { rows } = await db.query("SELECT * FROM books")
 
+            return rows
+        },
+        
+        async getBook(id) {
+            const { rows } = await db.query("SELECT * FROM books WHERE id = $1", [id])
 
-    await fs.writeFile(file, JSON.stringify(books, null, 4))
-    return newBook;
-}
+            return rows
+        },
+        
+        async updateBook({ id, title, author, release }) {
+            const sql = "UPDATE books SET title = $1, author = $2, release = $3 WHERE id = $4"
 
-export async function deleteBook(id) {
-    let books = await getAllBooks();
+            const { rows } = await db.query(sql, [title, author, release, id])
 
-    const index = books.findIndex((book) => book.id === id)
+            return rows
+        },
+        
+        async createBook({ title, author, release }) {
+            const sql = "INSERT INTO books (title, author, release) VALUES ($1, $2, $3)"
 
-    if (index === -1) {
-        return undefined
+            const { rows } = await db.query(sql, [title, author, release])
+
+            return rows
+        },
+        
+        async deleteBook(id) {
+            const { rows } = await db.query("DELETE FROM books WHERE id = $1", [id])
+
+            return rows
+        },
     }
-
-    const deletedBooks = books.splice(index, 1)
-
-    await fs.writeFile(file, JSON.stringify(books, null, 4))
-    return deletedBooks[0]
 }

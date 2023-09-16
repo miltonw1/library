@@ -1,19 +1,30 @@
 import { Router } from 'express'
 
-import * as booksController from '../controllers/books.controller.js'
+import booksController from '../controllers/books.controller.js'
 import { validateBook } from '../gateways/validators/books.validator.js'
+import booksRepository from '../repositories/books.repository.js'
 
-const booksRouter = Router()
+
+function makeBooksRouter(db) {
+    const booksRouter = Router()
+    
+
+    const repository = booksRepository(db)
+    const controller = booksController(repository)
+    
 
 
-booksRouter.get('/', booksController.getAllBooks)
+    booksRouter.get('/', controller.getAllBooks)
+    
+    booksRouter.get('/:id', controller.getBook)
+    
+    booksRouter.post('/', validateBook, controller.createBook)
+    
+    booksRouter.put('/:id', validateBook, controller.updateBook)
+    
+    booksRouter.delete('/:id', controller.deleteBook)
 
-booksRouter.get('/:id', booksController.getBook)
+    return booksRouter
+}
 
-booksRouter.post('/', validateBook, booksController.createBook)
-
-booksRouter.put('/:id', validateBook, booksController.updateBook)
-
-booksRouter.delete('/:id', booksController.deleteBook)
-
-export default booksRouter;
+export default makeBooksRouter;

@@ -1,46 +1,52 @@
-import * as booksRepository from '../repositories/books.repository.js'
-
-export async function getAllBooks(req, res) {
-    res.json(await booksRepository.getAllBooks())
-}
-
-export async function getBook(req, res) {
-    const id = parseInt(req.params.id)
-    const book = await booksRepository.getBook(id)
+function booksController (repository) {
     
-    if (!book) {
-        res.status(404).send("Sos un pelotudo")
-    } else {
-        res.json(book)
+    return {
+        async getAllBooks(req, res) {
+            res.json(await repository.getAllBooks())
+        },
+
+        async getBook(req, res) {
+            const id = parseInt(req.params.id)
+            const book = await repository.getBook(id)
+            
+            if (!book) {
+                res.status(404).send("No se encontro libro")
+            } else {
+                res.json(book)
+            }
+        },
+
+        async createBook(req, res) {
+            console.log({ payload: req.body })
+
+            const newBook = await repository.createBook(req.body)
+            res.status(201).json(newBook)
+        },
+
+        async updateBook(req, res) {
+            const payload = req.body
+            payload.id = parseInt(req.params.id)
+        
+            const updatedBook = await repository.updateBook(payload)
+        
+            if (updatedBook) {
+                res.status(202).json(updatedBook);
+            } else {
+                res.status(404).send("Not found");
+            }
+        },
+
+        async deleteBook(req, res){
+            const id = parseInt(req.params.id)
+            const deletedBook = await repository.deleteBook(id)
+        
+            if (deletedBook) {
+                res.status(204).json(deletedBook)
+            } else {
+                res.status(404).send("Not found")
+            } 
+        }
     }
 }
 
-export async function createBook(req, res) {
-    const newBook = await booksRepository.createBook(req.body)
-    res.status(201).json(newBook)
-}
-
-export async function updateBook(req, res) {
-    const payload = req.body
-    payload.id = parseInt(req.params.id)
-
-    const updatedBook = await booksRepository.updateBook(payload)
-
-    if (updatedBook) {
-        res.status(202).json(updatedBook);
-    } else {
-        res.status(404).send("Not found");
-    }
-}
-
-
-export async function deleteBook(req, res){
-    const id = parseInt(req.params.id)
-    const deletedBook = await booksRepository.deleteBook(id)
-
-    if (deletedBook) {
-        res.status(204).json(deletedBook)
-    } else {
-        res.status(404).send("Not found")
-    } 
-}
+export default booksController
