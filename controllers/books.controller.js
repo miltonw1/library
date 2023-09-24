@@ -17,8 +17,6 @@ function booksController (repository) {
         },
 
         async createBook(req, res) {
-            console.log({ payload: req.body })
-
             const newBook = await repository.createBook(req.body)
             res.status(201).json(newBook)
         },
