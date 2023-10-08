@@ -39,7 +39,7 @@ function usersController(repository) {
             const deletedUser = await repository.deleteUser(id)
 
             if (deletedUser) {
-                res.status(204).json(deletedUser)
+                res.status(202).json(deletedUser)
             } else {
                 res.status(404).send("Not found")
             }

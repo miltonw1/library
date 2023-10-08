@@ -39,7 +39,7 @@ function booksController (repository) {
             const deletedBook = await repository.deleteBook(id)
         
             if (deletedBook) {
-                res.status(204).json(deletedBook)
+                res.status(200).json(deletedBook)
             } else {
                 res.status(404).send("Not found")
             } 

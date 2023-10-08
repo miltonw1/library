@@ -1,16 +1,32 @@
-import * as borrowsRepository from '../repositories/borrows.repository.js'
+function BorrowsController(repository) {
 
 
-export async function getAllBorrows(req, res) {
-    res.json(await borrowsRepository.getAllBorrows())
-}
-export async function getBorrowByUser(req, res){
-    const id = parseInt(req.params.id)
-    const user = await usersRepository.getUser(id)
+    return {
+        async getPendingBorrows(req, res) {
+            res.json(await repository.getPending())
+        },
 
-    if (!user) {
-        res.status(404).send("Sos un pelotudo")
-    } else {
-        res.json(user)
+        async getBorrowsByUser(req, res) {
+            const userId = parseInt(req.params.user_id)
+            const borrows = await repository.getBorrowsByUser(userId)
+
+            res.json(borrows)
+        },
+
+        async getBorrowsByBook(req, res){
+            const bookId = parseInt(req.params.book_id)
+            const borrows = await repository.getBorrowsByBook(bookId)
+
+            res.json(borrows)
+        },
+
+        async createBorrow(req, res){
+            const payload = (req.body)
+            const borrow = await repository.createBorrow(payload)
+
+            res.status(201).json(borrow)
+        },
     }
 }
+
+export default BorrowsController

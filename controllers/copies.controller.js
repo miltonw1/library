@@ -43,7 +43,7 @@ function copiesController (repository) {
             const deletedCopy = await repository.deleteCopy(id)
         
             if (deletedCopy) {
-                res.status(204).json(deletedCopy)
+                res.status(202).json(deletedCopy)
             } else {
                 res.status(404).send("Not found")
             } 

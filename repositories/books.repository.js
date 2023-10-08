@@ -30,7 +30,7 @@ export default function booksRepository (db) {
         
         async deleteBook(id) {
             const { rows } = await db.query("DELETE FROM books WHERE id = $1 RETURNING *", [id])
-
+            console.log(rows)
             return rows[0]
         },
     }

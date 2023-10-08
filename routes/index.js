@@ -12,7 +12,7 @@ function makeMainRoutes (db) {
     
     router.use('/books', booksRoutes(db))
     router.use('/users', usersRoutes(db))
-    router.use('/borrows', borrowsRoutes)
+    router.use('/borrows', borrowsRoutes(db))
 
     return router
 }
